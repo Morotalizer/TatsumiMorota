@@ -1,7 +1,7 @@
 ﻿<#PSScriptInfo
 
 .VERSION 
-    3.0
+    3.1
 
 .GUID 
     
@@ -79,10 +79,10 @@
 # Parameters (to be used in an upcoming version, to choose computerobject from OU)
 [CmdletBinding()]
 param(
-	$SiteCode = "S01",
+	$SiteCode = "P01",
 	$DPGroup = "All DPs",
-	$DomainNetbiosName = "ragnsells.net",     
-    $DeviceOUPath = "OU=PM-Datorer_Win10,OU=Datorer,DC=ragnsells,DC=net"
+	$DomainNetbiosName = "contoso.com",     
+    $DeviceOUPath = "OU=Computers,DC=contoso,DC=com"
 )
 
 # We set the RunInstallAs32Bit parameter to a global variable, because it can be modified in multiple functions
