@@ -19,6 +19,7 @@
 # 2015/08/12 - Added Windows 10 - Collection 45
 # 2015/11/10 - Changed collection 4 to SP1 CU2 instead of CU1, Add collection 46
 # 2015/12/04 - Changed collection 4 to SCCM 1511 instead of CU2, Add collection 47
+# 2017/03/01 - Removed 1511 and 
 #
 # Purpose : This script create a set of SCCM collections and move it in an "Operational" folder
 #
@@ -84,6 +85,8 @@ $Collection45 = @{Name = "All Windows 10 Workstations"; Query = "select SMS_R_Sy
 $Collection46 = @{Name = "All Clients R2 SP1 CU2"; Query = "select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.ClientVersion = '5.00.8239.1301'"}
 $Collection47 = @{Name = "All Clients 1511"; Query = "select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.ClientVersion = '5.00.8325.1000'"}
 $Collection48 = @{Name = "All Microsoft SQL Servers"; Query = "select SMS_R_System.ResourceId, SMS_R_System.ResourceType, SMS_R_System.Name, SMS_R_System.SMSUniqueIdentifier, SMS_R_System.ResourceDomainORWorkgroup, SMS_R_System.Client from SMS_R_System inner join SMS_G_System_ADD_REMOVE_PROGRAMS_64 on SMS_G_System_ADD_REMOVE_PROGRAMS_64.ResourceID = SMS_R_System.ResourceId inner join SMS_G_System_ADD_REMOVE_PROGRAMS on SMS_G_System_ADD_REMOVE_PROGRAMS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_ADD_REMOVE_PROGRAMS_64.DisplayName like '%SQL Server%' or SMS_G_System_ADD_REMOVE_PROGRAMS.DisplayName = '%SQL Server%'"}
+$Collection49 = @{Name = "All Clients Non 1610"; Query = "select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.ClientVersion != '5.00.8458.1005'"}
+$Collection50 = @{Name = "All Clients 1610"; Query = "select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.ClientVersion = '5.00.8458.1005'"}
 
 #Create Default Folder 
 $CollectionFolder1 = @{Name = "Operational"; ObjectType = 5000; ParentContainerNodeId = 0}
@@ -240,6 +243,12 @@ Add-CMDeviceCollectionQueryMembershipRule -CollectionName $Collection47.Name -Qu
 New-CMDeviceCollection -Name $Collection48.Name -LimitingCollectionName $LimitingCollection -RefreshSchedule $Schedule -RefreshType 2
 Add-CMDeviceCollectionQueryMembershipRule -CollectionName $Collection48.Name -QueryExpression $Collection48.Query -RuleName $Collection48.Name
 
+New-CMDeviceCollection -Name $Collection49.Name -LimitingCollectionName $LimitingCollection -RefreshSchedule $Schedule -RefreshType 2
+Add-CMDeviceCollectionQueryMembershipRule -CollectionName $Collection49.Name -QueryExpression $Collection49.Query -RuleName $Collection49.Name
+
+New-CMDeviceCollection -Name $Collection50.Name -LimitingCollectionName $LimitingCollection -RefreshSchedule $Schedule -RefreshType 2
+Add-CMDeviceCollectionQueryMembershipRule -CollectionName $Collection50.Name -QueryExpression $Collection50.Query -RuleName $Collection50.Name
+
 #Move the collection to the right folder
 $FolderPath = $SiteCode.Name + ":\DeviceCollection\" + $CollectionFolder1.Name
 Move-CMObject -FolderPath $FolderPath -InputObject (Get-CMDeviceCollection -Name $Collection1.Name)
@@ -290,6 +299,8 @@ Move-CMObject -FolderPath $FolderPath -InputObject (Get-CMDeviceCollection -Name
 Move-CMObject -FolderPath $FolderPath -InputObject (Get-CMDeviceCollection -Name $Collection46.Name)
 Move-CMObject -FolderPath $FolderPath -InputObject (Get-CMDeviceCollection -Name $Collection47.Name)
 Move-CMObject -FolderPath $FolderPath -InputObject (Get-CMDeviceCollection -Name $Collection48.Name)
+Move-CMObject -FolderPath $FolderPath -InputObject (Get-CMDeviceCollection -Name $Collection49.Name)
+Move-CMObject -FolderPath $FolderPath -InputObject (Get-CMDeviceCollection -Name $Collection50.Name)
 
 Write-host "Completed !" -ForegroundColor WHITE
 
