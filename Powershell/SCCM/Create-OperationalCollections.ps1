@@ -19,7 +19,7 @@
 # 2015/08/12 - Added Windows 10 - Collection 45
 # 2015/11/10 - Changed collection 4 to SP1 CU2 instead of CU1, Add collection 46
 # 2015/12/04 - Changed collection 4 to SCCM 1511 instead of CU2, Add collection 47
-# 2017/03/01 - Removed 1511 and 
+# 2017/03/01 - Added 1610 Collections 
 #
 # Purpose : This script create a set of SCCM collections and move it in an "Operational" folder
 #
