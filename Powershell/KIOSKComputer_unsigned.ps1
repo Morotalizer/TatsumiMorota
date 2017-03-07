@@ -314,7 +314,7 @@ $listComputer.Width = 100
 $listComputer.Height = 30
 $listComputer.location = new-object system.drawing.point(190,72)
 $Form.controls.Add($listComputer)
-$PMComputerLists = Get-ADComputer -Filter * -SearchBase "OU=PM-Datorer_Win10,OU=Datorer,DC=ragnsells,DC=net" | Select-Object -ExpandProperty Name
+$PMComputerLists = Get-ADComputer -Filter * -SearchBase "OU=PM-Datorer_Win10,OU=Datorer,DC=[DOMAIN],DC=net" | Select-Object -ExpandProperty Name
     foreach ($PMComputerList in $PMComputerLists) {
                       $listComputer.Items.Add($PMComputerList)
                               } #end foreach
