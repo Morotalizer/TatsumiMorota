@@ -1,7 +1,7 @@
 ﻿<#PSScriptInfo
 
 .VERSION 
-    3.1
+    3.3
 
 .GUID 
     
@@ -49,6 +49,11 @@
     
 
     CHANGELOG
+        Version 3.3 2017-03-07
+            - Added dropdown list instead of txtbox
+            - Added search from AD OU to populate dropdownlist
+        Version 3.2 2017-03-06
+            - Added error handling WINRM service not running
         Version 3.1 2017-03-03
             - Moved functions to top (to work outside ISE)
             - Added check for AD module
@@ -75,16 +80,6 @@
 
 #>
 
-
-# Parameters (to be used in an upcoming version, to choose computerobject from OU)
-[CmdletBinding()]
-param(
-	$SiteCode = "P01",
-	$DPGroup = "All DPs",
-	$DomainNetbiosName = "contoso.com",     
-    $DeviceOUPath = "OU=Computers,DC=contoso,DC=com"
-)
-
 # We set the RunInstallAs32Bit parameter to a global variable, because it can be modified in multiple functions
 #[bool]$global:RunInstallAs32Bit = $RunInstallAs32Bit
 
@@ -108,35 +103,76 @@ $OkToProceed = Validate-Form
 
         if ($radioReboot.Checked)
         {
-        Invoke-Command -ComputerName $textComputer.Text -ScriptBlock { powershell -file "c:\Shell\reboot.ps1"}
-        $ProgressBar1.PerformStep()
-        Write-Host "Reboting Computer " -NoNewline; Write-Host $textComputer.Text -ForegroundColor Green
-        }
+            try
+            {
+                $reachable = $true
+                Invoke-Command -ComputerName $listComputer.SelectedItem.ToString() -ErrorAction Stop -ScriptBlock {powershell -file "C:\Shell\reboot.ps1"} 
+            }
+            catch
+            { 
+                $reachable = $false
+                write-host $textComputer.Text "ERROR: WINRM service is not running on remote computer, please start it" -ForegroundColor RED
+            } 
+            if ($reachable)
+            {
+                Invoke-Command -ComputerName $listComputer.SelectedItem.ToString() -ScriptBlock {powershell -file "C:\Shell\reboot.ps1"}
+                $ProgressBar1.PerformStep()
+                Write-Host "Rebooting Computer " -NoNewline; Write-Host $textComputer.Text -ForegroundColor Green
+            }
+        }      
         if ($radioRemove.Checked)
         {
-        Invoke-Command -ComputerName $textComputer.Text -ScriptBlock { powershell -file "c:\Shell\remove.ps1"}
-        $ProgressBar1.PerformStep()
-        Write-Host "Shell being deactivated and restarting Computer " -NoNewline; Write-Host $textComputer.Text -ForegroundColor Green
+            try
+            {
+                $reachable = $true
+                Invoke-Command -ComputerName $listComputer.SelectedItem.ToString() -ScriptBlock { powershell -file "C:\Shell\remove.ps1"}
+            }
+            catch
+            {
+                $reachable = $false
+                write-host $textComputer.Text "ERROR: WINRM service is not running on remote computer, please start it" -ForegroundColor RED
+            }
+            if ($reachable)
+            {
+                Invoke-Command -ComputerName $listComputer.SelectedItem.ToString() -ScriptBlock { powershell -file "C:\Shell\remove.ps1"}
+                $ProgressBar1.PerformStep()
+                Write-Host "Shell being deactivated and rebooting Computer " -NoNewline; Write-Host $textComputer.Text -ForegroundColor Green    
+            }
         }
         if ($radioAdd.Checked)
         {
-        Invoke-Command -ComputerName $textComputer.Text -ScriptBlock { powershell -File "c:\Shell\new.ps1"}
-        $ProgressBar1.PerformStep()
-        Write-Host "Shell being activated and restarting Computer " -NoNewline; Write-Host $textComputer.Text -ForegroundColor Green
+            try
+            {
+                $reachable = $true
+                Invoke-Command -ComputerName $listComputer.SelectedItem.ToString() -ScriptBlock { powershell -File "C:\Shell\new.ps1"}
+            }
+            catch
+            {
+                $reachable = $false
+                write-host $textComputer.Text "ERROR: WINRM service is not running on remote computer, please start it" -ForegroundColor RED
+            }
+            if ($reachable)
+            {
+                Invoke-Command -ComputerName $listComputer.SelectedItem.ToString() -ScriptBlock { powershell -File "C:\Shell\new.ps1"}
+                $ProgressBar1.PerformStep()
+                Write-Host "Shell being activated and rebooting Computer " -NoNewline; Write-Host $textComputer.Text -ForegroundColor Green
+            }
         }
         # Clear the form
 		Write-Host "Done!`n" -ForegroundColor Green
 		$ProgressBar1.Step = 2
 		$ProgressBar1.PerformStep()
-		Start-Sleep 10
+		Start-Sleep 5
 		Load-Form
     }
 }
+
 #~~< Function Validate-Form >~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 function Validate-Form
 {
     $OkToProceed = $true
-    $ADComputer = $textComputer.Text
+    #$ADComputer = $textComputer.Text
+    $ADComputer = $listComputer.SelectedItem.ToString() #populate selected item 
 
     # Clear the progress bar
     $ProgressBar1.Visible = $false
@@ -149,18 +185,18 @@ function Validate-Form
     $ErrorProviderADComputerOn.Clear()
 
     # Check if the computername exist
-    if ($textComputer.Text.Length -gt 0 -and (Check-ADComputerExist $ADComputer) -eq $false)
+    if ($ADComputer.Length -gt 0 -and (Check-ADComputerExist $ADComputer) -eq $false)
     {
     	$OkToProceed = $false	
-        $ErrorProviderADComputer.SetError($textComputer, "An AD Computer named $ADComputer doesn't exists. Please type a correct computer name.")
+        $ErrorProviderADComputer.SetError($listComputer, "An AD Computer named $ADComputer doesn't exists. Please type a correct computer name.")
     }
         #Check if computer is Powered ON
     Else
     {
-        If ($textComputer.Text.Length -gt 0 -and (Check-ADComputerOn $ADComputer) -eq $false)
+        If ($ADComputer.Length -gt 0 -and (Check-ADComputerOn $ADComputer) -eq $false)
         {   
     	    $OkToProceed = $false	
-            $ErrorProviderADComputerOn.SetError($textComputer, "Computer $ADComputer seems to be powered OFF or is unreachable.")
+            $ErrorProviderADComputerOn.SetError($listComputer, "Computer $ADComputer seems to be powered OFF or is unreachable.")
         }
     }
     
@@ -183,7 +219,7 @@ function Check-ADComputerExist
 		$ADComputer
 	)
 	
-    $ComputerExist = Get-ADComputer -Filter {name -eq $ADComputer}
+    $ComputerExist = Get-ADComputer $ADComputer
 	if ($ComputerExist)
 	{
 		return $true
@@ -221,7 +257,7 @@ function Load-Form
 	$ProgressBar1.Value = 1
 	$ProgressBar1.Step = 1
     $textComputer.Clear()
-
+    
 }
 
 
@@ -263,7 +299,7 @@ $radioAdd.Height = 20
 $radioAdd.location = new-object system.drawing.point(86,175)
 $radioAdd.Font = "Microsoft Sans Serif,10"
 $Form.controls.Add($radioAdd)
-#~~< TextComputer >~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<#~~< TextComputer >~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $textComputer = New-Object system.windows.Forms.TextBox
 $textComputer.Width = 100
 $textComputer.Height = 20
@@ -271,6 +307,17 @@ $textComputer.location = new-object system.drawing.point(217,73)
 $textComputer.Font = "Microsoft Sans Serif,10"
 #$textComputer.Text = ""
 $Form.controls.Add($textComputer)
+#>
+$ListComputer = New-Object system.windows.Forms.ComboBox
+#$listComputer.Text = "listBox"
+$listComputer.Width = 100
+$listComputer.Height = 30
+$listComputer.location = new-object system.drawing.point(190,72)
+$Form.controls.Add($listComputer)
+$PMComputerLists = Get-ADComputer -Filter * -SearchBase "OU=PM-Datorer_Win10,OU=Datorer,DC=ragnsells,DC=net" | Select-Object -ExpandProperty Name
+    foreach ($PMComputerList in $PMComputerLists) {
+                      $listComputer.Items.Add($PMComputerList)
+                              } #end foreach
 #~~< LabelComputer >~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $labelComputer = New-Object system.windows.Forms.Label
 $labelComputer.Text = "Computername"
