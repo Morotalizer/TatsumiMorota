@@ -159,11 +159,22 @@ $OkToProceed = Validate-Form
             }
         }
         # Clear the form
-		Write-Host "Done!`n" -ForegroundColor Green
-		$ProgressBar1.Step = 2
-		$ProgressBar1.PerformStep()
-		Start-Sleep 5
-		Load-Form
+		if ($reachable)
+        {
+            Write-Host "Done!`n" -ForegroundColor Green
+            $ProgressBar1.Step = 2
+		    $ProgressBar1.PerformStep()
+		    Start-Sleep 5
+		    Load-Form
+        }
+        else
+        {
+            Write-Host "Correct error then try again!`n" -ForegroundColor RED
+            $ProgressBar1.Step = 2
+		    $ProgressBar1.PerformStep()
+		    Start-Sleep 5
+		    Load-Form
+        }
     }
 }
 
@@ -256,8 +267,6 @@ function Load-Form
 	$ProgressBar1.Maximum = 2
 	$ProgressBar1.Value = 1
 	$ProgressBar1.Step = 1
-    $textComputer.Clear()
-    
 }
 
 
@@ -299,17 +308,8 @@ $radioAdd.Height = 20
 $radioAdd.location = new-object system.drawing.point(86,175)
 $radioAdd.Font = "Microsoft Sans Serif,10"
 $Form.controls.Add($radioAdd)
-<#~~< TextComputer >~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$textComputer = New-Object system.windows.Forms.TextBox
-$textComputer.Width = 100
-$textComputer.Height = 20
-$textComputer.location = new-object system.drawing.point(217,73)
-$textComputer.Font = "Microsoft Sans Serif,10"
-#$textComputer.Text = ""
-$Form.controls.Add($textComputer)
-#>
+#~~< ListComputer >~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $ListComputer = New-Object system.windows.Forms.ComboBox
-#$listComputer.Text = "listBox"
 $listComputer.Width = 100
 $listComputer.Height = 30
 $listComputer.location = new-object system.drawing.point(190,72)
