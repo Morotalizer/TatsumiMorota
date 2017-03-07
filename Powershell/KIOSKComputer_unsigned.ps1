@@ -52,6 +52,8 @@
         Version 3.3 2017-03-07
             - Added dropdown list instead of txtbox
             - Added search from AD OU to populate dropdownlist
+            - Added Error handling/message
+            - Added -Asjob on invoke command
         Version 3.2 2017-03-06
             - Added error handling WINRM service not running
         Version 3.1 2017-03-03
@@ -115,7 +117,7 @@ $OkToProceed = Validate-Form
             } 
             if ($reachable)
             {
-                Invoke-Command -ComputerName $listComputer.SelectedItem.ToString() -ScriptBlock {powershell -file "C:\Shell\reboot.ps1"}
+                Invoke-Command -ComputerName $listComputer.SelectedItem.ToString() -ScriptBlock {powershell -file "C:\Shell\reboot.ps1"} -AsJob
                 $ProgressBar1.PerformStep()
                 Write-Host "Rebooting Computer " -NoNewline; Write-Host $textComputer.Text -ForegroundColor Green
             }
@@ -134,7 +136,7 @@ $OkToProceed = Validate-Form
             }
             if ($reachable)
             {
-                Invoke-Command -ComputerName $listComputer.SelectedItem.ToString() -ScriptBlock { powershell -file "C:\Shell\remove.ps1"}
+                Invoke-Command -ComputerName $listComputer.SelectedItem.ToString() -ScriptBlock { powershell -file "C:\Shell\remove.ps1"} -AsJob
                 $ProgressBar1.PerformStep()
                 Write-Host "Shell being deactivated and rebooting Computer " -NoNewline; Write-Host $textComputer.Text -ForegroundColor Green    
             }
@@ -153,7 +155,7 @@ $OkToProceed = Validate-Form
             }
             if ($reachable)
             {
-                Invoke-Command -ComputerName $listComputer.SelectedItem.ToString() -ScriptBlock { powershell -File "C:\Shell\new.ps1"}
+                Invoke-Command -ComputerName $listComputer.SelectedItem.ToString() -ScriptBlock { powershell -File "C:\Shell\new.ps1"} -AsJob
                 $ProgressBar1.PerformStep()
                 Write-Host "Shell being activated and rebooting Computer " -NoNewline; Write-Host $textComputer.Text -ForegroundColor Green
             }
