@@ -46,7 +46,7 @@ switch ($osArch.AddressWidth)
 "64" {$srcFolder = "\\dp\App\USMT\Files\amd64"}
 } 
 #$srcFolder = "\\myServer\users\usmt4"
-$CurrentUserFull = Get-WMIObject -class Win32_ComputerSystem | select username
+$CurrentUserFull = Get-WMIObject -class Win32_ComputerSystem | select-object username
 $CurrentUser = ($CurrentUserFull.username -split "\\")[1]
 $usmtFolder = "c:\usmt"
 $storePath = "\\sccm\usmt$\MigStore_$CurrentUser"
@@ -56,7 +56,7 @@ function scanstate {
 # If USMT folder exist, do not copy from network location
 if (!(Test-Path $usmtFolder)) {
 Write-Verbose "Copying data from $srcFolder to $usmtFolder"
-copy $srcFolder $usmtFolder -Recurse
+copy-item $srcFolder $usmtFolder -Recurse
 }
  
 Set-Location $usmtFolder
@@ -73,7 +73,7 @@ function loadstate {
 # If USMT folder exist, do not copy from network location
 if (!(Test-Path $usmtFolder)) {
 Write-Verbose "Copying data from $srcFolder to $usmtFolder"
-copy $srcFolder $usmtFolder -Recurse
+copy-item $srcFolder $usmtFolder -Recurse
 }
  
 Set-Location $usmtFolder
