@@ -22,7 +22,7 @@ Connect-MSGraph -ClientSecret $ClientSecret -Quiet
 
 
 #$deviceSerialNumber = Get-WmiObject win32_bios | select Serialnumber
-$SerialNumber.Serialnumber = Get-WmiObject win32_bios | select Serialnumber   
+$SerialNumber = Get-WmiObject win32_bios | select Serialnumber   
 
 $SerialNumberEncoded = [Uri]::EscapeDataString($SerialNumber.Serialnumber)
 $ResourceURI = "deviceManagement/windowsAutopilotDeviceIdentities?`$filter=contains(serialNumber,'$($SerialNumberEncoded)')"
