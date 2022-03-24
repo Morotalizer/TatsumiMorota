@@ -1,0 +1,5 @@
+$AppName = "Google Chrome 88.0.4324.146 (x64)"
+$Resource = 'deviceAppManagement/mobileApps'
+$IntuneApp = (Invoke-MSGraphRequest -HttpMethod GET -Url $Resource).Value | Where-Object { ($_.'displayName').contains("$AppName") }
+$URI = "deviceAppManagement/mobileApps/$($IntuneApp.Id)"
+Invoke-MSGraphRequest -HttpMethod DELETE -Url $URI
