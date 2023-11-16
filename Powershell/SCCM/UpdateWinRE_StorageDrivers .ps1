@@ -16,11 +16,17 @@ $DriverDir = "$env:SystemDrive\DrvTemp"
 
 # Get latest version of the storage driver
 $StorageDriver = Get-WindowsDriver -Online -All | Where-Object { $_.Inbox -eq $False -and $_.BootCritical -eq $True -and $_.OriginalFileName -match $DriverName } | Sort-Object Version -Descending | Select-Object -First 1
-writeLog "Found Storage Driver: $($StorageDriver.Driver)"
-WriteLog "Original Filename: $($StorageDriver.OriginalFileName)"
+if($StorageDriver.Count -eq 0){
+writelog = "No iaStorVD.inf driver found will look for iaStorAC.inf"
+$DriverName = "iaStorAC.inf"
+$StorageDriver = Get-WindowsDriver -Online -All | Where-Object { $_.Inbox -eq $False -and $_.BootCritical -eq $True -and $_.OriginalFileName -match $DriverName } | Sort-Object Version -Descending | Select-Object -First 1
+}
 
 # Ensure there is a single driver of matching criteria before beginning
 if ($null -ne $StorageDriver -and $StorageDriver.Count -eq 1) {
+    writeLog "Found Storage Driver: $($StorageDriver.Driver)"
+    WriteLog "Original Filename: $($StorageDriver.OriginalFileName)"
+
     # Create mount directory if it does not exist
     if (!(Test-Path -Path $MountDir)) {
         New-Item -Path $MountDir -ItemType Directory
