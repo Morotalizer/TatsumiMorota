@@ -1,4 +1,29 @@
-﻿#Logfile
+﻿<#
+.Synopsis
+   Update Windows Recovery Image with RAID drivers for DELL Laptops
+.DESCRIPTION
+   Update Windows Recovery Image with RAID drivers for DELL Laptops automatically by searching for iaStorVD.inf or iaStorAC.inf depending of what it found
+   Will Create a log file below C:\windows\ccm\logs\\InjectWinRE_$env:computername.log
+.EXAMPLE
+   For CM deploy as package to affected machines 
+   Command: "%Windir%\sysnative\WindowsPowerShell\v1.0\powershell.exe" -ExecutionPolicy Bypass -Command .\UpdateWinRE_StorageDrivers.ps1
+.NOTES
+	===========================================================================
+	 Created on:    2023-11-16
+	 Created by:   	Tatsumi Morota
+	 Organization: 	Advania
+	 Filename:     	UpdateWinRE_StorageDrivers .ps1
+	===========================================================================
+.FUNCTIONALITY
+   Version history:
+   1.0 Inital Release
+   1.1 Added Log
+   2.0 Added iaStorAC.inf as possible storage driver
+.
+
+#>
+
+#Logfile
 $Logfile = "C:\Windows\CCM\Logs\InjectWinRE_$env:computername.log"
 function WriteLog
 {
