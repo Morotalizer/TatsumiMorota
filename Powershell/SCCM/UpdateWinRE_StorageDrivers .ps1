@@ -93,3 +93,4 @@ else {
     $StorageDriver
     Exit -1
 }
+WriteLog "Added $($StorageDriver.Driver) succesfully"
