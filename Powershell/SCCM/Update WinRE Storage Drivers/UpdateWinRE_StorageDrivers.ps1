@@ -18,11 +18,12 @@
    Version history:
    1.0 Inital Release
    1.1 Added Log
-   2.0 Added iaStorAC.inf as possible storage driver
+   2.0 Added iaStorAC.inf as possible storage driver required by some Dell models
 #>
 
 #Logfile
 $Logfile = "C:\Windows\CCM\Logs\UpdateWinRE_StorageDrivers.log"
+
 function WriteLog
 {
 Param ([string]$LogString)
@@ -38,6 +39,7 @@ $MountDir = "$env:SystemDrive\WinRE"
 $DriverDir = "$env:SystemDrive\DrvTemp"
 
 # Get latest version of the storage driver
+WriteLog "Trying first to find iaStorVD.inf"
 $StorageDriver = Get-WindowsDriver -Online -All | Where-Object { $_.Inbox -eq $False -and $_.BootCritical -eq $True -and $_.OriginalFileName -match $DriverName } | Sort-Object Version -Descending | Select-Object -First 1
 if($StorageDriver.Count -eq 0){
 writelog = "No iaStorVD.inf driver found will look for iaStorAC.inf"
@@ -78,6 +80,9 @@ if ($null -ne $StorageDriver -and $StorageDriver.Count -eq 1) {
     Remove-Item -Path $DriverDir -Recurse
     Remove-Item -Path $MountDir
     WriteLog "Cleanup Directories"
+
+    # Detection Method
+    Reg add "HKLM\SOFTWARE\Morotalized\WinREStorageDrivers" /v Installed /t REG_SZ /d "True" /f
 }
 # Throw an error so you can find devices that might need manual intervention
 elseif($StorageDriver.Count -eq 0) {
