@@ -16,6 +16,6 @@ Import-Module OSD -Force
 
 #Start OSDCloud ZTI the RIGHT way
 Write-Host  -ForegroundColor Cyan "Start OSDCloud with MY Parameters"
-Start-OSDCloud -OSLanguage en-us -OSBuild 20H2 -OSEdition Enterprise -ZTI
+Start-OSDCloudtart -OSBuild 24H2 -OSEdition Enterprise -ZTI
 
 
