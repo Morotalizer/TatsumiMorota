@@ -16,5 +16,5 @@ Import-Module OSD -Force
 
 #Start OSDCloud ZTI the RIGHT way
 Write-Host  -ForegroundColor Cyan "Start OSDCloud"
-Start-OSDCloud -OSBuild 24H2 -OSEdition Enterprise -ZTI
+Start-OSDCloud -OSBuild 24H2 -OSEdition Enterprise -ZTI -
 Start-Sleep -Seconds 60iins
