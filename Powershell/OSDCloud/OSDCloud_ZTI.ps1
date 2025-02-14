@@ -15,6 +15,6 @@ Write-Host  -ForegroundColor Cyan "Importing the sweet OSD PowerShell Module"
 Import-Module OSD -Force
 
 #Start OSDCloud ZTI the RIGHT way
-Write-Host  -ForegroundColor Cyan "Start OSDCloud"
-Start-OSDCloud -ZTI
+Write-Host  -ForegroundColor Cyan "Start OSDCloudGUI"
+Start-OSDCloudGUI -ZTI
 Start-Sleep -Seconds 60iins
